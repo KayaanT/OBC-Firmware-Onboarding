@@ -80,7 +80,7 @@ static void thermalMgr(void *pvParameters) {
         if (event.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
             LOG_IF_ERROR_CODE(readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp));
             addTemperatureTelemetry(temp);
-        } else if (event.type == THERMAL_MGR_EVENT_OS_INT) {
+        } else if (event.type == THERMAL_MGR_EVENT_OS_INTERRUPT) {
             LOG_IF_ERROR_CODE(readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp));
             if (temp > LM75BD_DEFAULT_OT_THRESH) {
                 overTemperatureDetected();
