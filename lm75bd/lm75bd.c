@@ -26,25 +26,24 @@ error_code_t lm75bdInit(lm75bd_config_t *config) {
 }
 
 error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
-  /* Implement this driver function */
-  error_code_t errCode;
+    if (temp == NULL) {
+        return ERR_CODE_INVALID_ARG;
+    }
 
-  if (temp == NULL) {
-    return ERR_CODE_INVALID_ARG;
-  }
+    error_code_t errCode;
+    uint8_t writeBuffer[1];
+    uint8_t readBuffer[2];
 
-  // uint8_t regTemp = 0x00U;
-  uint8_t buffer[2];
-  buffer[0] = 0x00U;
+    writeBuffer[0] = 0x00U;
+    RETURN_IF_ERROR_CODE(i2cSendTo(devAddr, writeBuffer, 1));
+    RETURN_IF_ERROR_CODE(i2cReceiveFrom(devAddr, readBuffer, 2));
 
-  RETURN_IF_ERROR_CODE(i2cSendTo(devAddr, buffer, 1));
-  RETURN_IF_ERROR_CODE(i2cReceiveFrom(devAddr, buffer, 2));
+    int16_t rawTemp = (int16_t)((readBuffer[0] << 8) | readBuffer[1]) >> 5;  
+    *temp = rawTemp * 0.125f;
 
-  int16_t rawTemp = (int16_t) ((buffer[0] << 8) | buffer[1]) >> 5;  // Combine MSByte and LSByte, then align to 11 bits
-  *temp = rawTemp * 0.125f;
-  
-  return ERR_CODE_SUCCESS;
+    return ERR_CODE_SUCCESS;
 }
+
 
 #define CONF_WRITE_BUFF_SIZE 2U
 error_code_t writeConfigLM75BD(uint8_t devAddr, uint8_t osFaultQueueSize, uint8_t osPolarity,
