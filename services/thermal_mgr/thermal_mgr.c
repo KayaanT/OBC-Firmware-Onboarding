@@ -62,7 +62,7 @@ error_code_t thermalMgrSendEvent(thermal_mgr_event_t *event) {
 
 void osHandlerLM75BD(void) {
   /* Implement this function */
-  thermal_mgr_event_t event = {.type = THERMAL_MGR_EVENT_OS_INT}
+  thermal_mgr_event_t event = {.type = THERMAL_MGR_EVENT_OS_INT};
 }
 
 static void thermalMgr(void *pvParameters) {
@@ -74,7 +74,7 @@ static void thermalMgr(void *pvParameters) {
     float temp;
     error_code_t errCode = readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp);
 
-    if (xQueueReceive(thermalMgrQueueHandle, &event, 0) == pdPass) {
+    if (xQueueReceive(thermalMgrQueueHandle, &event, 0) == pdPASS) {
       if (errCode != ERR_CODE_SUCCESS) {
         LOG_ERROR_CODE(errCode);
       }
