@@ -31,8 +31,8 @@ error_code_t readTempLM75BD(uint8_t devAddr, float *temp) {
     }
 
     error_code_t errCode;
-    uint8_t writeBuffer[1];
-    uint8_t readBuffer[2];
+    uint8_t writeBuffer[1] = {0x00U}; 
+    uint8_t readBuffer[2] = {0};
 
     writeBuffer[0] = 0x00U;
     RETURN_IF_ERROR_CODE(i2cSendTo(devAddr, writeBuffer, 1));
