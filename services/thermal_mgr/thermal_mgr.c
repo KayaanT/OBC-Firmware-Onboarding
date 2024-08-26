@@ -75,6 +75,8 @@ static void thermalMgr(void *pvParameters) {
         }
 
         float temp;
+        error_code_t errCode;
+        
         LOG_IF_ERROR_CODE(readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp));
             
         if (event.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
