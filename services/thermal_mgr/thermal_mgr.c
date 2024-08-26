@@ -66,32 +66,28 @@ void osHandlerLM75BD(void) {
 }
 
 static void thermalMgr(void *pvParameters) {
-  /* Implement this task */
-
   thermal_mgr_event_t event;
 
   while (1) {
-    float temp;
-    error_code_t errCode = readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp);
+    if (xQueueReceive(thermalMgrQueueHandle, &event, portMAX_DELAY) == pdPASS) {
+      float temp;
+      error_code_t errCode = readTempLM75BD(LM75BD_OBC_I2C_ADDR, &temp);
 
-    if (xQueueReceive(thermalMgrQueueHandle, &event, 0) == pdPASS) {
       if (errCode != ERR_CODE_SUCCESS) {
-        LOG_ERROR_CODE(errCode);
-      }
-
-      if (event.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
-        addTemperatureTelemetry(temp);
-      }
-
-      if (event.type == THERMAL_MGR_EVENT_OS_INT) {
-        if (temp > LM75BD_DEFAULT_OT_THRESH) {
-          overTemperatureDetected();
+          LOG_ERROR_CODE(errCode);
+      } else {
+          if (event.type == THERMAL_MGR_EVENT_MEASURE_TEMP_CMD) {
+            addTemperatureTelemetry(temp);
+          } else if (event.type == THERMAL_MGR_EVENT_OS_INT) {
+              if (temp > LM75BD_DEFAULT_OT_THRESH) {
+                overTemperatureDetected();
+              } else if (temp <= LM75BD_DEFAULT_HYST_THRESH) {
+                safeOperatingConditions();
+              }
+          } else {
+              LOG_ERROR_CODE(ERR_CODE_INVALID_QUEUE_MSG);
+          }
         }
-        else if (temp <= LM75BD_DEFAULT_HYST_THRESH) {
-          safeOperatingConditions();
-        }
-      }
-      LOG_ERROR_CODE(ERR_CODE_INVALID_QUEUE_MSG);
     }
   }
 }
